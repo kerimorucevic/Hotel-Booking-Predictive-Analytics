@@ -1,0 +1,247 @@
+---
+title: "Homework 3"
+author: "Kerim Orucevic"
+date: "2026-05-25"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Homework 3 
+
+```{r}
+
+library(tidyverse)
+
+library(readr)
+
+hotel_bookings_read_file <-read_csv('/Users/kerimorucevic/Downloads/hotel_bookings.csv')
+
+
+
+```
+
+
+
+
+
+1a:
+My primary coviariate of interest is lead_time. One interaction term I would like to choose, also from the list, is market_segment. I believe that this interaction of market_segment can be picked well with lead_time as an interaction element because I believe that the categories in market_segment like direct, corporate, groups, offline, online, complementary, etc., may influence the relation in lead times to the average daily rates for each customer in each of those three categories whether they are just booking direct stays, corporate stays with a company for business, or booking online, offline, or if their stay is complementary. I believe that the type of booking influences relationship between lead times and average daily rates because due to the difference in types of booking, the hotels have to work differently with the bookers, exercising potential inconveniences and hardships for the hotel and finding bookings. This is why average daily rates might differ for each of the market segment groups. Model: adr =B0+ B1*lead_time +B2*market_segmenti+ B3*(lead_time  * market_segmenti) + Error term. Null Hypothesis: Ho: B1 = 0 & B3 = 0. Alternative Hypothesis: Ha: B1 \= 0 or B3 \= 0. Verbal Null Hypothesis: Lead_time is not associated with average daily rates(adr) even with any category of market_segment. The association that lies between lead_time and average daily rates(adr) is unchanged no matter which market segment category it is with.   Verbal Alternative Hypothesis: Lead_time and average daily rates(adr) are associated together one or more market_segment categories, or lead_time and average daily rates(adr)'s relationship becomes changed by each market segment. 
+
+
+
+
+
+1b.:
+```{r}
+
+primary_model_kerim<- lm(adr~lead_time *market_segment, data =hotel_bookings_read_file)
+summary(primary_model_kerim)
+
+
+hist(hotel_bookings_read_file$adr, main = "The Distribution of Average Daily Rates", xlab ="Average Daily Rates")
+
+
+
+
+model_just_lead_time<- lm(adr~ lead_time, data =hotel_bookings_read_file)
+summary(model_just_lead_time)
+
+
+confint(model_just_lead_time)
+
+
+plot(hotel_bookings_read_file$lead_time, hotel_bookings_read_file$adr,xlab = "Lead Time", ylab = "Average Daily Rates", main = "Average Daily Rates vs Lead Time",ylim = c(0, 600))
+
+
+
+
+
+model_just_market_segment<- lm(adr ~market_segment, data = hotel_bookings_read_file)
+
+summary(model_just_market_segment)
+confint(model_just_market_segment)
+
+
+
+boxplot(adr~ market_segment, data =hotel_bookings_read_file,xlab = "Market Segment",ylab = "Average Daily Rates",main = "Average Daily Rates by Market Segment", ylim =c(0, 600), cex.axis =0.4)
+
+
+ggplot(hotel_bookings_read_file, aes(x =lead_time,y= adr, color= market_segment))+geom_point(alpha = 0.2) +geom_smooth(method = "lm", se = FALSE, linewidth =1.2) +
+  coord_cartesian(ylim =c(0, 600))+ labs(title ="Average Daily Rates vs Lead Time by Market Segment",x ="Lead Time",y = "Average Daily Rates") 
+
+
+
+  
+```
+Observations: This last plot of the series is essentially the plot representing the model. The points are the regular data points of the lead times in relation to their average daily rates of booking for each data point, and each different colored line is a line of regression on the points in the graph dedicated to their respective market segment categories they fall into. Basically, the way to tell if the lead_time data is in any way affected by the interaction term is if some of the lines are in different directions or are not directly parallel with each other, and in this case, some are not parallel with the rest, meaning the interaction term might have an effect on the relationship between lead_times and average daily rates. 
+
+
+
+
+1c.1.:
+```{r}
+
+
+
+primary_model_kerim <- lm(adr ~ lead_time *market_segment, data = hotel_bookings_read_file)
+
+
+summary(primary_model_kerim)
+
+
+confint(primary_model_kerim)
+
+
+
+
+```
+Primary Analysis: 
+
+Model: adr =B0+ B1*lead_time +B2*market_segmenti+ B3*(lead_time  * market_segmenti) + E.
+Restatement of the Null & Alternative Hypothesis: Null Hypothesis: Ho: B1 = 0 & B3 = 0. Alternative Hypothesis: Ha: B1 \= 0 or B3 \= 0. Verbal Null Hypothesis: Lead_time is not associated with average daily rates(adr) even with any category of market_segment. The association that lies between lead_time and average daily rates(adr) is unchanged no matter which market segment category it is with. Verbal Alternative Hypothesis: Lead_time and average daily rates(adr) are associated together one or more market_segment categories, or lead_time and average daily rates(adr)'s relationship becomes changed by each market segment. 
+My primary model indicates that the average daily rates, in covariance with lead_times, when interacting with the market segment category, is not really statistically significant enough to make a conclusion that Ha: B1 \= 0 or B3 \= 0. I am failing to reject the null because the interaction coefficients were not statistically significant enough to reject the null hypothesis that the relationship between the lead time in booking and the average daily rates of hotels does not change or get affected significantly in different market segments. However, what is interesting, is that these variables, when linear models are performed on their own in relation to the average daily rates of the hotels in the database, have statistically significant effects on the average daily rates when each variable is the sole covariate without an interaction term. Lead times, by itself, has a statistically significant effect on average daily rates of hotels, as shown earlier above. The market segment of the hotel trip, by itself, also has a statistically significant effect on average daily rates of hotels, also as shown earlier above. As far as the interaction term is (lead_time*market_segment), lead_time is the change in the average daily rates every day the lead time for a booking increases, for each particular market segment category. The interaction terms represent how much the slope for lead_time changes for each other market segment compared with the reference segment.
+
+
+
+1d.1.:
+```{r}
+plot(primary_model_kerim$fitted.values,rstandard(primary_model_kerim),ylim = c(-5, 5), main = "Residuals vs Fitted Values", xlab = "Fitted Values", ylab = "Standardized Residuals")
+
+abline(h = 0, col = "blue")
+qqnorm(rstandard(primary_model_kerim),
+       ylim = c(-5, 5),
+       main = "Q-Q Residuals")
+qqline(rstandard(primary_model_kerim), col = "blue")
+
+plot(primary_model_kerim$fitted.values, sqrt(abs(rstandard(primary_model_kerim))), ylim = c(0, 3),main = "Scale-Location", xlab = "Fitted values",
+     ylab = "Sqrt(|Standardized Residuals|)")
+
+plot(hatvalues(primary_model_kerim),rstandard(primary_model_kerim), ylim = c(-5, 5),main = "Residuals vs Leverage",xlab = "Leverage",  ylab = "Standardized Residuals")
+
+alternative_model_primary <- lm(adr~ lead_time + market_segment, data = hotel_bookings_read_file)
+
+summary(primary_model_kerim)
+summary(alternative_model_primary)
+
+
+
+
+anova(alternative_model_primary, primary_model_kerim)
+
+```
+Essentially, the secondary analysis of the model that I created needs to follow the four conditions that the relationship between X and Y, if there is one, is 'Linear', has 'Independent Observations', has 'Normality of the error term', and it has 'Equal Variance across all values of X', or homoskedasticity. Going through these plots, the residual vs. fitted values, the histogram of the residuals, the QQ-plot, and the Shapiro-Wilk test, I am going to conclude that the conditions are all not met. The linearity is not met as the residuals vs. fitted values graph is not in a shape where the model can be linear, it gets larger as the fitted value numbers increase indicating a non-linear relationship. The independent observations requirement is met. The normality of the error term is not achieved as the QQ-plot upper tail is skewed to the left, indicating a non-normal distribution, but the sample size of the model is well over large enough to not need to follow a normal distribution, so the condition is satisfied. The equal variance across values of x, or homoskedasticity requirement is not fulfilled as the variance differs for many, many values of x across the residuals vs. fitted values graph. 
+
+
+Also, for the alternative model, I chose to just remove the interaction term from the primary model and create that model in of itself, with just the variables of lead_time and market_segment as separate covariates. I wanted to see how different only changing the inclusion of an interaction term would affect the results of the average daily rate. My conclusion from the side-by-side models and the difference in models is that in the primary model, with the interaction term, the p-value is 0.455, which is not significant enough at the 0.05 level, indicating that with the interaction terms, there isn't statistically significant evidence that lead_time can predict the average daily rates of hotels. So, there is no evidence that market segment changes affect the relationship between lead time and average daily rates. However, with the alternative model, the interaction element is removed, resulting in a p-value of 2e-16, making the covariate of lead_time statistically significant, with only a small effect, however, of 0.012 euros of average daily rate of hotels per day booked later. As far as the model fits go, each of their R-squared values are 0.1503(primary model), and 0.1432(altered model), meaning that the primary model fits better than the altered model, only slightly though. In the anova analysis between the two models, the F-statistic ended up being 142.78, and the p-value for the analysis was 2.2e-16, making it statistically significant that the primary model with the interaction terms fits better than the alternative model without it, rejecting the null hypothesis that the interaction term does not improve the fit of the model, even though the actual effects of the model are not that practical to the real world, and pretty negligible, much more negligible than I thought. So, the average daily rate barely changes by the lead time of the booking, it varies a lot by the market segment it is in, and with adding an interaction term to see how the market segment influences the relationship between the lead times and the average daily rates, the model improves, but only slightly. 
+
+
+
+
+
+
+2a:
+
+My primary covariate of interest is deposit_type. One confounder I will choose is previous_cancellations. I believe that a good analysis can be formed with looking for deposit_type as a causal element of is_canceled. Me personally, I believe that the kind of deposit necessary to book a hotel might be the inferring factor in if the customer cancels or does not cancel their reservation. Also, I chose the confounding variable to be previous_cancellations because people who have previously canceled their stays could have an association with the type of deposit necessary to book their hotel visit. In general, these peoples' track record of whether or not previous cancellations have been a part of their lives can also be a factor in whether or not they cancel their stays, and I believe has a chance to influence the statistics of the primary covariate, deposit_type, as well as, additionally, the outcome variable of is_canceled. Null Hypothesis is Ho: B = 0. Alternative Hypothesis is Ha: B \= 0. Model: y = B0 + B1(deposit_type) + B2(previous_cancellations). Verbal Null Hypothesis: The deposit type for booking a stay at a hotel, associated with the person's previous cancellations, has zero effect on if a stay is canceled or not. Verbal Alternative Hypothesis: The deposit type for booking a stay at a hotel, associated with the person's previous cancellations, has a statistically significant effect on if a stay is canceled or not. 
+
+
+2b.1.: I am expecting the class distribution of is_canceled to be a distribution of just 0 and 1 outputs, looking almost perfectly linear between the outputs of 0 and 1 on the y-graph. Due to the fact that is_canceled is the name of the variable instead of is_booked, likely, to me, I would assume that more values would be 0, than 1, meaning more stays would be booked rather than canceled. If it were the other way around, the variable would be called is_booked. After looking, the true class imbalance of the data is that the actual percentages and proportions of the counts in the data that are 0 or 1 for is_canceled is 75166 to 44224, so 62.96% to 37.04%, or 0.6296 to 0.3704, both in the data tables showed below. This balance might be an issue for my model because some conclusions as to the model regarding how deposit_type influences is_canceled might be a little bit less credible due to the majority of the results already being that they were not canceled, or 0 in the is_canceled column. However, it could be a lot worse and the ratio of canceled vs. non-canceled stays is closer to 50/50 than it is to being extremely lopsided. 
+```{r}
+table(hotel_bookings_read_file$is_canceled)
+
+
+prop.table(table(hotel_bookings_read_file$is_canceled))
+
+
+
+```
+
+
+2b.2.:
+```{r}
+# re-leveling the data here so that the 'No Deposit' option of the deposit_type variable serves as the baseline.
+
+hotel_bookings_read_file$deposit_type <- relevel((factor(hotel_bookings_read_file$deposit_type)),ref = "No Deposit")
+
+question_2_primary_model <- glm(is_canceled ~ deposit_type + previous_cancellations,data =hotel_bookings_read_file,family = binomial)
+
+summary(question_2_primary_model)
+
+hotel_bookings_read_file %>%
+  group_by(deposit_type,is_canceled) %>%summarise(n = n(), .groups = "drop") %>%group_by(deposit_type) %>%
+  mutate(percent = 100*n/sum(n))
+
+
+ggplot(hotel_bookings_read_file,aes(x =deposit_type,fill =factor(is_canceled))) +geom_bar(position= "fill") +labs(x = "Deposit Method",y = "Proportion of Canceled",fill ="Canceled")
+```
+Essentially, this summary table is strange to me. With bookings that had no deposit, 28.4% were canceled, 71.6% were not canceled. Where it gets weird, however, is that approximately 99.4% of stays with non-refundable deposits made were canceled. 0.6% of these non-refundable deposit stays were not canceled, which is strange because the participants willingly canceled their stays knowing they would not get their money back. For stays scheduled with deposits that were refundable, 22.2% were canceled and 77.8% were not. It is still strange to me that 99.4% of stays with non-refundable deposits were canceled even though the deposits guaranteed no money back. 
+
+
+The bar chart indicates that non-refundable deposit types are exceedingly more cancelable by proportion than the rest. Next is the no-deposit stays, and last is the refundable stays. 
+
+
+
+
+
+
+2c.1.: 
+```{r}
+
+
+summary(question_2_primary_model)
+
+
+exp(coef(question_2_primary_model))
+
+```
+Null Hypothesis is Ho: B = 0. Alternative Hypothesis is Ha: B \= 0. Model: y = B0 + B1(deposit_type) + B2(previous_cancellations). Verbal Null Hypothesis: The deposit type for booking a stay at a hotel, associated with the person's previous cancellations, has zero effect on if a stay is canceled or not. Verbal Alternative Hypothesis: The deposit type for booking a stay at a hotel, associated with the person's previous cancellations has a statistically significant effect on if a stay is canceled or not. The results of the regression analysis show that deposit type sown with previous cancellation of the individual are heavily associated with cancellations in hotel stays due to the fact that the coefficients for deposit_typeNon Refund and previous_cancellations are statistically significant at the 0.05 level and at levels much, much lower, and deposit_typeRefundable is not statistically significant at the 0.05 level, but has a p-value of 0.134. This is due to the low sample size of hotel stays with refundable deposit policies. Overall, this indicates that the deposit type and previous cancellation of individuals heavily impact hotel booking cancellations, at a statistically significant level, leading me to reject the null hypothesis that the deposit type for booking a stay at a hotel, associated with the person's previous cancellations, has zero effect on if a stay is canceled or not. 
+
+2c.2.:
+
+Controlling the previous_cancellations constant, non-refundable deposit-based stays have a 337.865 better chance of being canceled to hotel bookings in with no deposits. Also, there is a 3.31 better chance that a hotel stay would get canceled with each previous cancellation associated with an individual, by itself, than with hotel bookings with no deposits. 
+
+
+2c.3.:
+
+
+Statistical significance, by itself, in our model, can't automatically give a good classification threshold for predicting cancellations because statistical significance only gives us whether or not the predictive variable or model is correlated or associated with the outcome variable, not what probability is a good threshold for the data's significance. It does not give us a good classification threshold, to get that we would need more information in other measures of how well the predictive models are. 
+
+
+
+
+2d.1.:
+```{r}
+
+residual_data_for_plot <- data.frame(fitted = fitted(question_2_primary_model),residuals = residuals(question_2_primary_model, type ="deviance")
+)
+
+ggplot(data= residual_data_for_plot,aes(x = fitted, y = residuals)) +geom_point(alpha= 0.1) +geom_smooth(method= "loess", se =FALSE) +
+  geom_hline(yintercept = 0,linetype ="dashed") 
+
+alternative_model_primary_kerim_orucevic <- glm(adr~ deposit_type, data = hotel_bookings_read_file)
+
+summary(question_2_primary_model)
+
+
+
+
+
+summary(alternative_model_primary_kerim_orucevic)
+
+anova(alternative_model_primary_kerim_orucevic, question_2_primary_model)
+
+
+
+
+```
+
+These conditions, in Lecture 16, are just one condition, the condition of linearity. 
+In my observations, I do not see that the models show any kind of irregularly strong patterns or violations of linearity, making them valid and passing the linearity condition.
+
+
+2d.2.: My alternative model was simply the primary model but without the confounding variable, previous_cancellations. The alternative model yields that deposit types are really good and efficient in predicting the cancellation status of hotel bookings. This makes the regular(primary) model and the alternative model yielding very similar conclusions in the fact that non-refundable deposits highly predict cancellations. 
+
+
+
