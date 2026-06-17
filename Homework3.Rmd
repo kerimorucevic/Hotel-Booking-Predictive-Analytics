@@ -17,7 +17,7 @@ library(tidyverse)
 
 library(readr)
 
-hotel_bookings_read_file <-read_csv('/Users/kerimorucevic/Downloads/hotel_bookings.csv')
+hotel_bookings_read_file <-read_csv('/Users/kerimorucevic/Desktop/Hotel Booking Project DSC 152/hotel_bookings.csv')
 
 
 
